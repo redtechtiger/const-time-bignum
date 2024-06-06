@@ -1,3 +1,8 @@
+//! # Const-time-bignum
+//! A bignum library that operates in constant time and without any heap allocations.
+//!
+//! ⚠️ This library is currently under development and should not be used.
+
 use std::fmt;
 use std::ops::{Add, Div, Mul, Rem, Shl, Shr, Sub};
 
@@ -161,10 +166,10 @@ impl Rem for BigU288 {
             flag &= (divisor.0[i] == 0) as usize;
         }
         divisor = divisor << n; // TODO: Make this constant time!
-        
+
         // TODO: This is temporary! Need to find a more permament solution
         let mut n: i64 = n as i64;
-        
+
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
@@ -193,7 +198,6 @@ impl Rem for BigU288 {
 impl Div for BigU288 {
     type Output = BigU288;
     fn div(self, other: Self) -> Self::Output {
-
         let mut numerator = self;
         let mut divisor = other;
         let mut quotient = BigU288::new(); // 0
@@ -208,10 +212,10 @@ impl Div for BigU288 {
             flag &= !(divisor.0[i] != 0) as usize;
         }
         divisor = divisor << n; // TODO: Make this constant time!
-        
+
         // TODO: This is temporary! Need to find a more permament solution
         let mut n: i64 = n as i64;
-        
+
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
@@ -339,4 +343,3 @@ fn pad_array_bigu288(input: &[u8]) -> [u8; 36] {
     padded[..input.len()].copy_from_slice(input);
     padded
 }
-
