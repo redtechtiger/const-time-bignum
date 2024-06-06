@@ -1,6 +1,9 @@
 [package]
 name = "const-time-bignumm"
+description = "A constant time bignum library that operates fully on the stack, effectively eliminating the side channel attack vector."
+repository = "https://github.com/redtechtiger/const-time-bignum"
+keywords = ["crypto", "bignum", "constant"]
+licence = "MIT"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
