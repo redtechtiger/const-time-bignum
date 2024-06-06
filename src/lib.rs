@@ -3,20 +3,22 @@
 //!
 //! ⚠️ This library is currently under development and should not be used.
 
+
 use std::fmt;
 use std::ops::{Add, Div, Mul, Rem, Shl, Shr, Sub};
 
 #[derive(Debug, Copy, Clone)]
-pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
+#[allow(non_camel_case_types)]
+pub struct u288([u8; 36]); // 288 bit unsigned integer (8x36)
 
-impl fmt::Display for BigU288 {
+impl fmt::Display for u288 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_hex())
     }
 }
 
-impl Add for BigU288 {
-    type Output = BigU288;
+impl Add for u288 {
+    type Output = u288;
     fn add(self, other: Self) -> Self::Output {
         let mut output = self;
         let mut carry = 0;
@@ -33,8 +35,8 @@ impl Add for BigU288 {
     }
 }
 
-impl Sub for BigU288 {
-    type Output = BigU288;
+impl Sub for u288 {
+    type Output = u288;
     fn sub(self, other: Self) -> Self::Output {
         let mut output = self;
         let mut carry = 0;
@@ -50,10 +52,10 @@ impl Sub for BigU288 {
     }
 }
 
-impl Mul for BigU288 {
-    type Output = BigU288;
+impl Mul for u288 {
+    type Output = u288;
     fn mul(self, other: Self) -> Self::Output {
-        let mut total_sum = BigU288::new();
+        let mut total_sum = u288::new();
         for (i, byte_self) in self.0.iter().enumerate() {
             // Multiply entire second number by each byte in self
             let mut working_sum = other;
@@ -74,12 +76,12 @@ impl Mul for BigU288 {
 }
 
 // NOTE: This shifts in base 256
-impl Shl<BigU288> for BigU288 {
-    type Output = BigU288;
+impl Shl<u288> for u288 {
+    type Output = u288;
     fn shl(mut self, other: Self) -> Self::Output {
         let mut output = self;
-        let mut i = BigU288::new(); // initializes to 0
-        let one = BigU288::from_hex("1");
+        let mut i = u288::new(); // initializes to 0
+        let one = u288::from_hex("1");
         while other > i {
             for j in 0..self.0.len() - 1 {
                 output.0[j + 1] = self.0[j];
@@ -93,8 +95,8 @@ impl Shl<BigU288> for BigU288 {
 }
 
 // NOTE: This shifts in base 256
-impl Shl<usize> for BigU288 {
-    type Output = BigU288;
+impl Shl<usize> for u288 {
+    type Output = u288;
     fn shl(mut self, other: usize) -> Self::Output {
         let mut output = self;
         let mut i: usize = 0; // initializes to 0
@@ -111,12 +113,12 @@ impl Shl<usize> for BigU288 {
 }
 
 // NOTE: This shifts in base 256
-impl Shr<BigU288> for BigU288 {
-    type Output = BigU288;
+impl Shr<u288> for u288 {
+    type Output = u288;
     fn shr(mut self, other: Self) -> Self::Output {
         let mut output = self;
-        let mut i = BigU288::new(); // initializes to 0
-        let one = BigU288::from_hex("1");
+        let mut i = u288::new(); // initializes to 0
+        let one = u288::from_hex("1");
         while other > i {
             for j in (1..self.0.len() - 2).rev() {
                 output.0[j - 1] = self.0[j];
@@ -130,8 +132,8 @@ impl Shr<BigU288> for BigU288 {
 }
 
 // NOTE: This shifts in base 256
-impl Shr<usize> for BigU288 {
-    type Output = BigU288;
+impl Shr<usize> for u288 {
+    type Output = u288;
     fn shr(mut self, other: usize) -> Self::Output {
         let mut output = self;
         let mut i: usize = 0; // initializes to 0
@@ -149,13 +151,13 @@ impl Shr<usize> for BigU288 {
 
 // This is slow. TODO: Look into implementing a more performant algorithm!
 // TODO: Do this in constant time!
-impl Rem for BigU288 {
-    type Output = BigU288;
+impl Rem for u288 {
+    type Output = u288;
     fn rem(self, other: Self) -> Self::Output {
         let mut numerator = self;
         let mut divisor = other;
-        let mut quotient = BigU288::new(); // 0
-        let one = BigU288::from_hex("1");
+        let mut quotient = u288::new(); // 0
+        let one = u288::from_hex("1");
 
         // Align divisor to msb of numerator and store the shift amount in n
         let mut n: usize = 0;
@@ -173,7 +175,7 @@ impl Rem for BigU288 {
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
-            let mut i = BigU288::new();
+            let mut i = u288::new();
             while divisor <= numerator {
                 numerator = numerator - divisor;
                 i = i + one;
@@ -195,13 +197,13 @@ impl Rem for BigU288 {
     // }
 }
 // TODO: Do this in constant time!
-impl Div for BigU288 {
-    type Output = BigU288;
+impl Div for u288 {
+    type Output = u288;
     fn div(self, other: Self) -> Self::Output {
         let mut numerator = self;
         let mut divisor = other;
-        let mut quotient = BigU288::new(); // 0
-        let one = BigU288::from_hex("1");
+        let mut quotient = u288::new(); // 0
+        let one = u288::from_hex("1");
 
         // Align divisor to msb of numerator and store the shift amount in n
         let mut n: usize = 0;
@@ -219,7 +221,7 @@ impl Div for BigU288 {
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
-            let mut i = BigU288::new();
+            let mut i = u288::new();
             while divisor <= numerator {
                 numerator = numerator - divisor;
                 i = i + one;
@@ -232,12 +234,12 @@ impl Div for BigU288 {
     }
 
     // fn div(self, other: Self) -> Self::Output {
-    //     let mut quotient = BigU288::new();
+    //     let mut quotient = u288::new();
     //     let mut numerator = self;
     //     while numerator >= other {
     //         // bigu288::new() is equal to 0
     //         numerator = numerator - other;
-    //         quotient = quotient + BigU288::from_hex("1");
+    //         quotient = quotient + u288::from_hex("1");
     //     }
     //     quotient
     // }
@@ -245,8 +247,8 @@ impl Div for BigU288 {
 
 // I don't actually know if a simple == is constant time, but to be on the safe side I implemented
 // a constant time loop.
-impl PartialEq<BigU288> for BigU288 {
-    fn eq(&self, other: &BigU288) -> bool {
+impl PartialEq<u288> for u288 {
+    fn eq(&self, other: &u288) -> bool {
         let mut equal = 1;
         for (i, byte_self) in self.0.iter().enumerate() {
             equal &= (*byte_self == other.0[i]) as u8;
@@ -255,13 +257,13 @@ impl PartialEq<BigU288> for BigU288 {
     }
 }
 
-// impl PartialEq<u8> for BigU288 {
+// impl PartialEq<u8> for u288 {
 //     fn eq(&self, other: &u8) -> bool {
 //         self.0[0] == *other
 //     }
 // }
 
-impl PartialOrd<BigU288> for BigU288 {
+impl PartialOrd<u288> for u288 {
     fn lt(&self, other: &Self) -> bool {
         let mut lt = 0;
         for (i, byte_self) in self.0.iter().enumerate() {
@@ -295,16 +297,16 @@ impl PartialOrd<BigU288> for BigU288 {
     }
 }
 
-impl Eq for BigU288 {}
+impl Eq for u288 {}
 
-impl BigU288 {
-    pub fn from_slice(bytes: &[u8]) -> BigU288 {
-        let mut big_u288 = BigU288::new();
+impl u288 {
+    pub fn from_slice(bytes: &[u8]) -> u288 {
+        let mut big_u288 = u288::new();
         big_u288.0 = pad_array_bigu288(bytes).as_slice().try_into().unwrap();
         big_u288
     }
-    pub fn from_hex(input: &str) -> BigU288 {
-        let mut big_u288 = BigU288::new();
+    pub fn from_hex(input: &str) -> u288 {
+        let mut big_u288 = u288::new();
         // Iterate over the string backwards (we want little endian)
         let input_padded_le: [u8; 72] = pad_array_hex(&input.bytes().rev().collect::<Vec<_>>()[..]);
         for (i, char) in input_padded_le.iter().enumerate() {
@@ -327,8 +329,8 @@ impl BigU288 {
     pub fn get_bytes(&self) -> [u8; 36] {
         self.0
     }
-    pub fn new() -> BigU288 {
-        BigU288([0; 36])
+    pub fn new() -> u288 {
+        u288([0; 36])
     }
 }
 
