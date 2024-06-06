@@ -1,5 +1,5 @@
 [package]
-name = "const-time-bignumm"
+name = "const-time-bignum"
 description = "A constant time bignum library that operates fully on the stack, effectively eliminating the side channel attack vector."
 repository = "https://github.com/redtechtiger/const-time-bignum"
 keywords = ["crypto", "bignum", "constant"]
