@@ -4,6 +4,6 @@ description = "A constant time bignum library that operates fully on the stack, 
 repository = "https://github.com/redtechtiger/const-time-bignum"
 keywords = ["crypto", "bignum", "constant"]
 license = "MIT"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
