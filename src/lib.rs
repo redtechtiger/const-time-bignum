@@ -149,19 +149,17 @@ impl Shr<usize> for u288 {
     }
 }
 
-const fn get_m(k: u32, n: u64) -> usize {
-    let two: u64 = 2;
-    (two.pow(k) / n) as usize
-}
-
-fn barrett_reduce(a: u288, n: u288, k: usize, m: u288) -> u288 { // m
-    let mut a = a;
-    let q: u288 = (a * m) >> k; // This shifts by too much :(
-    a = a - (q * n);
-    if a>=n {
-        a = a - n;
+const fn choose_k(n: u288) -> usize {
+    // For now, let k be the number of bytes present in en
+    let mut i = 0;
+    let mut k = 0usize;
+    let mut flag = true;
+    while i<n.0.len() {
+        k += (n.0[i] != 0 && flag) as usize;
+        flag &= n.0[i] != 0;
+        i += 1;
     }
-    a
+    k * 8 // u288 internally uses bytes - this isn't optimal at all but will do for now
 }
 
 // This is slow. TODO: Look into implementing a more performant algorithm!
@@ -169,6 +167,7 @@ fn barrett_reduce(a: u288, n: u288, k: usize, m: u288) -> u288 { // m
 impl Rem for u288 {
     type Output = u288;
     fn rem(self, other: Self) -> Self::Output {
+        dbg!(choose_k(u288::from_hex("1024")));
         todo!();
     }
     // fn rem(self, other: Self) -> Self::Output {
