@@ -162,6 +162,10 @@ const fn choose_k(n: u288) -> usize {
     k * 8 // u288 internally uses bytes - this isn't optimal at all but will do for now
 }
 
+const fn precompute_r(k: usize, n: u288) {
+    (n << k/8) / n;
+}
+
 // This is slow. TODO: Look into implementing a more performant algorithm!
 // TODO: Do this in constant time!
 impl Rem for u288 {
@@ -348,6 +352,11 @@ impl u288 {
     }
     pub fn get_bytes(&self) -> [u8; 36] {
         self.0
+    }
+    pub const fn one() -> u288 {
+        let mut one = u288([0; 36]);
+        one.0[0] = 1;
+        one
     }
     pub const fn new() -> u288 {
         u288([0; 36])
