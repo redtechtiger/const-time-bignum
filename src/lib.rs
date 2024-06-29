@@ -1,7 +1,7 @@
 //! # Const-time-bignum
 //! A bignum library that operates in constant time and without any heap allocations.
 //!
-//! ⚠️ This library is currently under development and should not be used.
+//! ⚠️ This library is currently under development and should not be used. See crates.io
 
 
 use std::fmt;
@@ -149,43 +149,61 @@ impl Shr<usize> for u288 {
     }
 }
 
+const fn get_m(k: u32, n: u64) -> usize {
+    let two: u64 = 2;
+    (two.pow(k) / n) as usize
+}
+
+fn barrett_reduce(a: u288, n: u288, k: usize, m: u288) -> u288 { // m
+    let mut a = a;
+    let q: u288 = (a * m) >> k; // This shifts by too much :(
+    a = a - (q * n);
+    if a>=n {
+        a = a - n;
+    }
+    a
+}
+
 // This is slow. TODO: Look into implementing a more performant algorithm!
 // TODO: Do this in constant time!
 impl Rem for u288 {
     type Output = u288;
     fn rem(self, other: Self) -> Self::Output {
-        let mut numerator = self;
-        let mut divisor = other;
-        let mut quotient = u288::new(); // 0
-        let one = u288::from_hex("1");
-
-        // Align divisor to msb of numerator and store the shift amount in n
-        let mut n: usize = 0;
-        let mut flag = 1; // Flag to detect when msb has been hit
-        for i in (0..numerator.0.len()).rev() {
-            // Iterate over the bytes backwards
-            n += flag & (numerator.0[i] != 0 && divisor.0[i] == 0) as usize;
-            flag &= (divisor.0[i] == 0) as usize;
-        }
-        divisor = divisor << n; // TODO: Make this constant time!
-
-        // TODO: This is temporary! Need to find a more permament solution
-        let mut n: i64 = n as i64;
-
-        // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
-        while other <= numerator {
-            // Subtract until not possible anymore, then add to quotient
-            let mut i = u288::new();
-            while divisor <= numerator {
-                numerator = numerator - divisor;
-                i = i + one;
-            }
-            quotient = quotient + i << n as usize;
-            n -= 1;
-            divisor = divisor >> 1;
-        }
-        numerator
+        todo!();
     }
+    // fn rem(self, other: Self) -> Self::Output {
+    //     let mut numerator = self;
+    //     let mut divisor = other;
+    //     let mut quotient = u288::new(); // 0
+    //     let one = u288::from_hex("1");
+
+    //     // Align divisor to msb of numerator and store the shift amount in n
+    //     let mut n: usize = 0;
+    //     let mut flag = 1; // Flag to detect when msb has been hit
+    //     for i in (0..numerator.0.len()).rev() {
+    //         // Iterate over the bytes backwards
+    //         n += flag & (numerator.0[i] != 0 && divisor.0[i] == 0) as usize;
+    //         flag &= (divisor.0[i] == 0) as usize;
+    //     }
+    //     divisor = divisor << n; // TODO: Make this constant time!
+
+    //     // TODO: This is temporary! Need to find a more permament solution
+    //     let mut n: i64 = n as i64;
+
+    //     // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
+    //     while other <= numerator {
+    //         // Subtract until not possible anymore, then add to quotient
+    //         let mut i = u288::new();
+    //         while divisor <= numerator {
+    //             numerator = numerator - divisor;
+    //             i = i + one;
+    //         }
+    //         quotient = quotient + i << n as usize;
+    //         n -= 1;
+    //         divisor = divisor >> 1;
+    //     }
+    //     numerator
+    // }
 
     // fn rem(self, other: Self) -> Self::Output {
     //     let mut numerator = self;
@@ -305,6 +323,9 @@ impl u288 {
         big_u288.0 = pad_array_bigu288(bytes).as_slice().try_into().unwrap();
         big_u288
     }
+    pub fn from_raw_bytes(bytes: [u8;36]) -> u288 {
+        u288(bytes)
+    }
     pub fn from_hex(input: &str) -> u288 {
         let mut big_u288 = u288::new();
         // Iterate over the string backwards (we want little endian)
@@ -329,7 +350,7 @@ impl u288 {
     pub fn get_bytes(&self) -> [u8; 36] {
         self.0
     }
-    pub fn new() -> u288 {
+    pub const fn new() -> u288 {
         u288([0; 36])
     }
 }
